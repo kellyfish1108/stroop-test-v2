@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>Stroop 顏色測驗（練習＋45 秒版）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      background: #f5f6fb;
+    }
+
+    .page {
+      display: none;
+      width: 100vw;
+      height: 100vh;
+      padding: 24px;
+    }
+
+    .page.active {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .btn {
+      padding: 12px 32px;
+      margin-top: 24px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      background: #3b82f6;
+      color: #fff;
+      box-shadow: 0 10px 18px rgba(59,130,246,0.25);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 26px rgba(59,130,246,0.3);
+      background: #2563eb;
+    }
+
+    .btn:active {
+      transform: translateY(0);
+      box-shadow: 0 8px 14px rgba(59,130,246,0.25);
+    }
+
+    /* ==== Page 1: 說明卡片 ==== */
+
+    #page-1-card {
+      width: 100%;
+      max-width: 980px;
+      background: #ffffff;
+      border-radius: 28px;
+      box-shadow: 0 18px 40px rgba(15,23,42,0.12);
+      padding: 32px 40px 30px;
+    }
+
+    #page-1-card h1 {
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 2rem;
+      color: #111827;
+    }
+
+    #page-1-subtitle {
+      text-align: center;
+      margin-bottom: 16px;
+      color: #6b7280;
+      font-size: 0.95rem;
+    }
+
+    .page1-main {
+      display: flex;
+      gap: 28px;
+      align-items: flex-start;
+      margin-top: 8px;
+    }
+
+    .page1-left {
+      flex: 3;
+    }
+
+    .page1-right {
+      flex: 2;
+      display: flex;
+      justify-content: center;
+    }
+
+    ol {
+      margin-left: 1.2rem;
+    }
+
+    li {
+      margin-bottom: 8px;
+      line-height: 1.7;
+      color: #374151;
+      font-size: 0.98rem;
+    }
+
+    .example-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: #f9fafb;
+      border: 1px dashed #e5e7eb;
+      font-size: 0.95rem;
+      color: #374151;
+    }
+
+    .page-1-footer {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    /* Page 1 右側示意圖（四色＋白圓＋紅色「黃」） */
+
+    .preview-box {
+      width: 260px;
+      max-width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 26px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 18px 30px rgba(15,23,42,0.25);
+    }
+
+    .preview-quarter {
+      position: absolute;
+      width: 50%;
+      height: 50%;
+    }
+
+    .preview-tl { top: 0; left: 0; background: #C00000; }
+    .preview-tr { top: 0; right: 0; background: #FFD501; }
+    .preview-bl { bottom: 0; left: 0; background: #0070C0; }
+    .preview-br { bottom: 0; right: 0; background: #00B050; }
+
+    .preview-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 60%;
+      height: 60%;
+      border-radius: 50%;
+      background: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .preview-char {
+      font-size: 7rem;
+      font-weight: 900;
+      color: #C00000;
+      user-select: none;
+    }
+
+    /* ==== Page 2: 受測者資訊 ==== */
+
+    #page-2-card {
+      width: 100%;
+      max-width: 520px;
+      background: #ffffff;
+      border-radius: 24px;
+      box-shadow: 0 16px 36px rgba(15,23,42,0.1);
+      padding: 32px 36px 28px;
+    }
+
+    #page-2-card h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 1.7rem;
+      color: #111827;
+    }
+
+    .form-group {
+      margin: 10px 0;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group label {
+      margin-bottom: 6px;
+      color: #374151;
+      font-size: 0.95rem;
+    }
+
+    .form-group input {
+      padding: 9px 10px;
+      font-size: 1rem;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 2px rgba(59,130,246,0.25);
+    }
+
+    /* ==== Page 3: 練習說明頁 ==== */
+
+    #practice-intro-card {
+      width: 100%;
+      max-width: 520px;
+      background: #ffffff;
+      border-radius: 24px;
+      box-shadow: 0 16px 36px rgba(15,23,42,0.12);
+      padding: 32px 36px 28px;
+      text-align: center;
+    }
+
+    #practice-intro-card p {
+      color: #4b5563;
+      margin-top: 8px;
+      line-height: 1.6;
+    }
+
+    /* ==== Page 4: 測驗畫面（練習 + 正式） ==== */
+
+    #test-page {
+      padding: 0;
+      background: #ffffff;
+    }
+
+    #test-layout {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      background-color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #mode-label {
+      position: absolute;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1rem;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.06);
+      color: #374151;
+      z-index: 20;
+    }
+
+    #word-container {
+      flex: 1;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      width: 100%;
+      padding-top: 80px;
+    }
+
+    #stroop-word {
+      font-size: 20vmin;
+      font-weight: 900;
+      user-select: none;
+    }
+
+    #options-row {
+      width: 100%;
+      padding-bottom: 60px;
+      display: flex;
+      justify-content: space-evenly;
+      align-items: flex-end;
+    }
+
+    .color-button {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      outline: none;
+      padding: 0;
+    }
+
+    /* 練習答案顯示：跟題目一樣，只是三格變白 */
+
+    #practice-feedback {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 24px;
+      background: transparent;
+      z-index: 40;
+      cursor: pointer;
+    }
+
+    #practice-feedback-text {
+      padding: 6px 16px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.9);
+      color: #4b5563;
+      font-size: 0.95rem;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+
+    /* 練習結束頁 */
+
+    #practice-start-inner {
+      width: 100%;
+      max-width: 520px;
+      text-align: center;
+    }
+
+    #practice-start-inner p {
+      color: #4b5563;
+      line-height: 1.6;
+    }
+
+    /* 結果頁（摘要） */
+
+    #page-4-card {
+      width: 100%;
+      max-width: 880px;
+      background: #ffffff;
+      border-radius: 24px;
+      box-shadow: 0 16px 36px rgba(15,23,42,0.12);
+      padding: 30px 32px 24px;
+    }
+
+    .result-header-title {
+      text-align: center;
+      font-size: 1.7rem;
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 10px;
+    }
+
+    .result-summary-box {
+      background: #eef2ff;
+      border-radius: 18px;
+      padding: 14px 18px;
+      margin: 0 auto 18px;
+      max-width: 520px;
+      color: #374151;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .result-summary-line {
+      margin: 2px 0;
+      text-align: center;
+    }
+
+    #results-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    /* 詳細頁 */
+
+    #detail-card {
+      width: 100%;
+      max-width: 880px;
+      background: #ffffff;
+      border-radius: 24px;
+      box-shadow: 0 16px 36px rgba(15,23,42,0.12);
+      padding: 26px 26px 20px;
+    }
+
+    #detail-card h2 {
+      text-align: center;
+      margin-bottom: 12px;
+      font-size: 1.5rem;
+      color: #111827;
+    }
+
+    .results-table-wrapper {
+      border-radius: 14px;
+      border: 1px solid #e5e7eb;
+      background: #f9fafb;
+      padding: 6px;
+      max-height: 460px;
+      overflow: auto;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      min-width: 600px;
+      background: #ffffff;
+    }
+
+    th, td {
+      border-bottom: 1px solid #e5e7eb;
+      padding: 6px 8px;
+      font-size: 0.85rem;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    th {
+      background-color: #f9fafb;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    /* 題目 / 正確答案：小卡片 */
+
+    .mini-stimulus {
+      position: relative;
+      width: 42px;
+      height: 42px;
+      border-radius: 6px;
+      border: 2px solid #e5e7eb;
+      background: #ffffff;
+      overflow: hidden;
+      display: inline-block;
+    }
+
+    .mini-block {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 65%;
+      height: 65%;
+      background: var(--color, #0070C0);
+      overflow: hidden;
+    }
+
+    .mini-circle {
+      position: absolute;
+      right: -120%;
+      top: -120%;
+      width: 240%;
+      height: 240%;
+      border-radius: 50%;
+      background: #ffffff;
+    }
+
+    .mini-symbol {
+      position: absolute;
+      left: 58%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--color, #0070C0);
+      user-select: none;
+    }
+
+    /* 您的選擇：顏色字 */
+
+    .choice-symbol {
+      font-size: 20px;
+      font-weight: 900;
+    }
+
+    /* 倒數畫面 */
+
+    #countdown-screen {
+      position: fixed;
+      inset: 0;
+      background: #ffffff;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 30;
+    }
+
+    #countdown-number {
+      font-size: 13vmin;
+      color: #4b5563;
+      font-weight: 500;
+      user-select: none;
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        padding: 18px;
+      }
+      #page-1-card,
+      #page-2-card,
+      #practice-intro-card,
+      #page-4-card,
+      #detail-card {
+        padding: 24px 18px 18px;
+      }
+      #stroop-word {
+        font-size: 18vmin;
+      }
+      .color-button {
+        width: 80px;
+        height: 80px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Page 1: 說明 -->
+  <section id="page-1" class="page active">
+    <div id="page-1-card">
+      <h1>Stroop 顏色遊戲</h1>
+      <div id="page-1-subtitle">
+        歡迎小朋友來玩顏色反應遊戲，請先看完下面說明。
+      </div>
+
+      <div class="page1-main">
+        <div class="page1-left">
+          <ol>
+            <li>正式遊戲會在 <strong>45 秒</strong> 內，看你可以作答多少題。</li>
+            <li>螢幕中間會出現一個「顏色字」或一個彩色的 <strong>X</strong>。</li>
+            <li><strong>不要念字的意思</strong>，只要看字或 X 的「顏色」。</li>
+            <li>螢幕下方有四個圓圈：紅、黃、藍、綠。請點選跟顏色<strong>一樣</strong>的圓圈。</li>
+            <li>正式測驗時，每一題點完後，會立刻出下一題，一直到 45 秒結束。</li>
+            <li>正式測驗之前，會先有<strong>練習題</strong>，每題答完會告訴你正確顏色。</li>
+          </ol>
+
+          <div class="example-box">
+            範例：如果你看到的是
+            <span style="color:#C00000;font-weight:700;">黃</span>，
+            代表字的顏色是<strong>紅色</strong>，要去按紅色的圓圈。
+          </div>
+        </div>
+
+        <div class="page1-right">
+          <div class="preview-box">
+            <div class="preview-quarter preview-tl"></div>
+            <div class="preview-quarter preview-tr"></div>
+            <div class="preview-quarter preview-bl"></div>
+            <div class="preview-quarter preview-br"></div>
+            <div class="preview-center">
+              <div class="preview-char">黃</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page-1-footer">
+        <button class="btn" id="go-to-info">下一步</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Page 2: 受測者資訊 -->
+  <section id="page-2" class="page">
+    <div id="page-2-card">
+      <h1>受測者資訊</h1>
+      <div class="form-group">
+        <label for="name">姓名</label>
+        <input type="text" id="name" placeholder="請輸入姓名" />
+      </div>
+      <div class="form-group">
+        <label for="birthday">生日</label>
+        <input type="date" id="birthday" />
+      </div>
+      <div style="display:flex;justify-content:center;margin-top:12px;">
+        <button class="btn" id="go-to-practice-intro">下一步</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Page 3: 練習說明 -->
+  <section id="practice-intro-page" class="page">
+    <div id="practice-intro-card">
+      <h2>先來做幾題練習</h2>
+      <p>
+        等一下會先出幾題練習題，讓你熟悉顏色的玩法。<br />
+        每一題作答後，螢幕會把正確顏色留下來給你看。<br />
+        準備好了再按下下面的按鈕開始練習。
+      </p>
+      <button class="btn" id="start-practice">開始練習</button>
+    </div>
+  </section>
+
+  <!-- Page 4: 測驗畫面（練習 + 正式） -->
+  <section id="test-page" class="page">
+    <div id="test-layout">
+      <div id="mode-label"></div>
+
+      <div id="word-container">
+        <div id="stroop-word">黃</div>
+      </div>
+
+      <div id="options-row">
+        <button class="color-button" data-color-key="red"></button>
+        <button class="color-button" data-color-key="yellow"></button>
+        <button class="color-button" data-color-key="blue"></button>
+        <button class="color-button" data-color-key="green"></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 練習答案顯示 -->
+  <div id="practice-feedback">
+    <div id="practice-feedback-text">這是正確的顏色，請點一下繼續下一題練習。</div>
+  </div>
+
+  <!-- 練習結束頁 -->
+  <section id="practice-start-page" class="page">
+    <div id="practice-start-inner">
+      <p>練習結束，等一下要開始正式測驗囉！</p>
+      <button class="btn" id="btn-start-formal">正式開始</button>
+    </div>
+  </section>
+
+  <!-- 倒數畫面 -->
+  <div id="countdown-screen">
+    <div id="countdown-number">3</div>
+  </div>
+
+  <!-- 結果摘要頁 -->
+  <section id="page-4" class="page">
+    <div id="page-4-card">
+      <div class="result-header-title">測驗完成</div>
+
+      <div class="result-summary-box" id="results-summary"></div>
+
+      <div id="results-buttons">
+        <button class="btn" id="btn-restart">再玩一次</button>
+        <button class="btn" id="btn-show-detail">詳細答題記錄</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 詳細答題記錄頁 -->
+  <section id="detail-page" class="page">
+    <div id="detail-card">
+      <h2>詳細答題記錄</h2>
+      <div class="results-table-wrapper">
+        <table id="results-table">
+          <thead>
+            <tr>
+              <th>題號</th>
+              <th>題目</th>
+              <th>正確答案</th>
+              <th>您的選擇</th>
+              <th>反應時間(ms)</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div style="display:flex;justify-content:center;margin-top:18px;">
+        <button class="btn" id="btn-detail-back">上一頁</button>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    window.addEventListener('load', () => {
+      const COLOR_CONFIG = [
+        { key: "red",    char: "紅", label: "紅色", hex: "#C00000" },
+        { key: "yellow", char: "黃", label: "黃色", hex: "#FFD501" },
+        { key: "blue",   char: "藍", label: "藍色", hex: "#0070C0" },
+        { key: "green",  char: "綠", label: "綠色", hex: "#00B050" },
+      ];
+      const COLOR_BY_KEY = COLOR_CONFIG.reduce((m,c)=>{m[c.key]=c;return m;},{});
+
+      const MODE_NONE = "none";
+      const MODE_PRACTICE1 = "practice1";
+      const MODE_PRACTICE2 = "practice2";
+      const MODE_TEST = "test";
+
+      const PRACTICE_TYPE1_TRIALS = 4;
+      const PRACTICE_TYPE2_TRIALS = 1;
+      const TEST_DURATION_MS = 45000;
+
+      const page1 = document.getElementById("page-1");
+      const page2 = document.getElementById("page-2");
+      const practiceIntroPage = document.getElementById("practice-intro-page");
+      const testPage = document.getElementById("test-page");
+      const practiceStartPage = document.getElementById("practice-start-page");
+      const page4 = document.getElementById("page-4");
+      const detailPage = document.getElementById("detail-page");
+
+      const goToInfoBtn = document.getElementById("go-to-info");
+      const goToPracticeIntroBtn = document.getElementById("go-to-practice-intro");
+      const startPracticeBtn = document.getElementById("start-practice");
+      const practiceStartBtn = document.getElementById("btn-start-formal");
+
+      const restartBtn = document.getElementById("btn-restart");
+      const showDetailBtn = document.getElementById("btn-show-detail");
+      const detailBackBtn = document.getElementById("btn-detail-back");
+
+      const nameInput = document.getElementById("name");
+      const birthdayInput = document.getElementById("birthday");
+
+      const stroopWordEl = document.getElementById("stroop-word");
+      const colorButtons = Array.from(document.querySelectorAll(".color-button"));
+      const modeLabelEl = document.getElementById("mode-label");
+
+      const practiceFeedback = document.getElementById("practice-feedback");
+
+      const countdownScreen = document.getElementById("countdown-screen");
+      const countdownNumber = document.getElementById("countdown-number");
+
+      const resultsSummary = document.getElementById("results-summary");
+      const resultsTableBody = document.querySelector("#results-table tbody");
+
+      let currentMode = MODE_NONE;
+
+      let practiceType1Index = 0;
+      let practiceType2Index = 0;
+      let practiceType1Order = [];
+
+      let currentInkColorKey = null;
+      let currentWordChar = null;
+
+      let previousTestWordChar = null;  // 正式測驗上一題的字
+
+      let testRecords = [];
+      let testStartTime = null;
+      let trialStartTime = null;
+
+      // 固定選項顏色順序：紅、黃、藍、綠
+      function resetOptionColors() {
+        colorButtons.forEach(btn => {
+          const key = btn.dataset.colorKey;
+          if (!key) return;
+          btn.style.backgroundColor = COLOR_BY_KEY[key].hex;
+        });
+      }
+      resetOptionColors();
+
+      function showPage(p) {
+        [page1,page2,practiceIntroPage,testPage,practiceStartPage,page4,detailPage].forEach(x=>{
+          if(x) x.classList.remove("active");
+        });
+        p.classList.add("active");
+      }
+
+      function shuffleArray(array) {
+        const arr = array.slice();
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+      }
+
+      function pickRandom(arr) {
+        return arr[Math.floor(Math.random()*arr.length)];
+      }
+
+      function setModeLabel(text){ modeLabelEl.textContent = text || ""; }
+
+      /* ==== 練習流程 ==== */
+
+      function startPracticeSequence(){
+        currentMode = MODE_PRACTICE1;
+        practiceType1Index = 0;
+        practiceType2Index = 0;
+        practiceType1Order = shuffleArray(COLOR_CONFIG.map(c=>c.key));
+        setModeLabel("練習題");
+        resetOptionColors();
+        showPage(testPage);
+        setupNextPracticeTrial();
+      }
+
+      function setupNextPracticeTrial(){
+        showPage(testPage);
+        setModeLabel("練習題");
+        resetOptionColors();
+
+        if(currentMode === MODE_PRACTICE1){
+          if(practiceType1Index >= PRACTICE_TYPE1_TRIALS){
+            currentMode = MODE_PRACTICE2;
+            setupNextPracticeTrial();
+            return;
+          }
+          const colorKey = practiceType1Order[practiceType1Index];
+          const colorCfg = COLOR_BY_KEY[colorKey];
+
+          currentInkColorKey = colorKey;
+          currentWordChar = "X";
+
+          stroopWordEl.textContent = "X";
+          stroopWordEl.style.color = colorCfg.hex;
+
+        } else if(currentMode === MODE_PRACTICE2){
+          if(practiceType2Index >= PRACTICE_TYPE2_TRIALS){
+            currentMode = MODE_NONE;
+            setModeLabel("");
+            showPage(practiceStartPage);
+            return;
+          }
+
+          currentInkColorKey = "red";
+          currentWordChar = "黃";
+          stroopWordEl.textContent = currentWordChar;
+          stroopWordEl.style.color = COLOR_BY_KEY["red"].hex;
+        }
+      }
+
+      function showPracticeFeedback(){
+        colorButtons.forEach(btn=>{
+          const key = btn.dataset.colorKey;
+          if(!key) return;
+          if(key === currentInkColorKey){
+            btn.style.backgroundColor = COLOR_BY_KEY[key].hex;
+          } else {
+            btn.style.backgroundColor = "#FFFFFF";
+          }
+        });
+        practiceFeedback.style.display = "flex";
+      }
+
+      function handlePracticeAnswer(chosenKey){
+        showPracticeFeedback();
+      }
+
+      function proceedAfterPracticeFeedback(){
+        practiceFeedback.style.display = "none";
+        if(currentMode === MODE_PRACTICE1){
+          practiceType1Index += 1;
+        } else if(currentMode === MODE_PRACTICE2){
+          practiceType2Index += 1;
+        }
+        setupNextPracticeTrial();
+      }
+
+      /* ==== 正式測驗流程 ==== */
+
+      function generateStroopStimulus(){
+        resetOptionColors();
+
+        const inkColor = pickRandom(COLOR_CONFIG);
+        currentInkColorKey = inkColor.key;
+
+        // 字面顏色：不能跟 ink 相同，也不能跟上一題字一樣
+        let wordColor;
+        const candidates = COLOR_CONFIG.filter(c=>c.key!==inkColor.key);
+        let attempts = 0;
+        do {
+          wordColor = pickRandom(candidates);
+          attempts++;
+        } while(previousTestWordChar && wordColor.char === previousTestWordChar && attempts < 20);
+
+        currentWordChar = wordColor.char;
+        previousTestWordChar = currentWordChar;
+
+        stroopWordEl.textContent = currentWordChar;
+        stroopWordEl.style.color = inkColor.hex;
+      }
+
+      function startCountdown(cb){
+        let n = 3;
+        countdownNumber.textContent = n;
+        countdownScreen.style.display = "flex";
+
+        const timerId = setInterval(()=>{
+          n--;
+          if(n<=0){
+            clearInterval(timerId);
+            countdownScreen.style.display = "none";
+            cb();
+          } else {
+            countdownNumber.textContent = n;
+          }
+        },1000);
+      }
+
+      function startFirstTestTrial(){
+        showPage(testPage);
+        setModeLabel("正式測驗中");
+        generateStroopStimulus();
+        trialStartTime = performance.now();
+      }
+
+      function handleTestAnswer(chosenKey){
+        if(!testStartTime) return;
+
+        const rt = performance.now() - trialStartTime;
+        const inkCfg = COLOR_BY_KEY[currentInkColorKey];
+        const chosenCfg = COLOR_BY_KEY[chosenKey];
+
+        testRecords.push({
+          trialNumber: testRecords.length+1,
+          wordChar: currentWordChar,
+          inkColorLabel: inkCfg.label,
+          inkColorKey: currentInkColorKey,
+          correctAnswer: inkCfg.label,
+          correctKey: currentInkColorKey,
+          chosenAnswer: chosenCfg.label,
+          chosenKey: chosenKey,
+          reactionTimeMs: Math.round(rt)
+        });
+
+        const elapsed = performance.now() - testStartTime;
+        if(elapsed >= TEST_DURATION_MS){
+          finishTest();
+        } else {
+          generateStroopStimulus();
+          trialStartTime = performance.now();
+        }
+      }
+
+      function finishTest(){
+        currentMode = MODE_NONE;
+        countdownScreen.style.display = "none";
+        setModeLabel("");
+        showPage(page4);
+
+        const total = testRecords.length;
+        const totalCorrect = testRecords.filter(r=>r.chosenKey === r.correctKey).length;
+        const accuracy = total>0 ? Math.round(totalCorrect/total*100) : 0;
+        const totalRT = testRecords.reduce((s,r)=>s+r.reactionTimeMs,0);
+        const avgRT = total>0 ? Math.round(totalRT/total) : 0;
+
+        resultsSummary.innerHTML = `
+          <div class="result-summary-line">總作答題數：<strong>${total}</strong></div>
+          <div class="result-summary-line">答對題數：<strong>${totalCorrect}</strong></div>
+          <div class="result-summary-line">正確率：<strong>${accuracy}%</strong></div>
+          <div class="result-summary-line">平均反應時間：<strong>${total>0 ? avgRT+" 毫秒" : "—"}</strong></div>
+        `;
+
+        // 詳細紀錄表格
+        resultsTableBody.innerHTML = "";
+        testRecords.forEach(r=>{
+          const inkHex = COLOR_BY_KEY[r.inkColorKey].hex;
+
+          const stimulusHtml = `
+            <div class="mini-stimulus" style="--color:${inkHex}">
+              <div class="mini-block"></div>
+              <div class="mini-circle"></div>
+              <div class="mini-symbol">${r.wordChar}</div>
+            </div>
+          `;
+
+          const correctHtml = `
+            <div class="mini-stimulus" style="--color:${inkHex}">
+              <div class="mini-block"></div>
+              <div class="mini-circle"></div>
+              <div class="mini-symbol">X</div>
+            </div>
+          `;
+
+          const choiceCfg = COLOR_BY_KEY[r.chosenKey];
+          const choiceHtml = `
+            <span class="choice-symbol" style="color:${choiceCfg.hex};">
+              ${choiceCfg.char}
+            </span>
+          `;
+
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${r.trialNumber}</td>
+            <td>${stimulusHtml}</td>
+            <td>${correctHtml}</td>
+            <td>${choiceHtml}</td>
+            <td>${r.reactionTimeMs}</td>
+          `;
+          resultsTableBody.appendChild(tr);
+        });
+      }
+
+      function startFormalTest(){
+        currentMode = MODE_TEST;
+        testRecords = [];
+        previousTestWordChar = null;
+        testStartTime = performance.now();
+        startCountdown(startFirstTestTrial);
+      }
+
+      /* ==== 事件綁定 ==== */
+
+      goToInfoBtn.addEventListener("click", ()=>{ showPage(page2); });
+
+      goToPracticeIntroBtn.addEventListener("click", ()=>{
+        const name = nameInput.value.trim();
+        const birth = birthdayInput.value;
+        // 目前只是收集，不特別顯示 / 存檔
+        showPage(practiceIntroPage);
+      });
+
+      startPracticeBtn.addEventListener("click", ()=>{ startPracticeSequence(); });
+
+      practiceStartBtn.addEventListener("click", ()=>{ startFormalTest(); });
+
+      colorButtons.forEach(btn=>{
+        btn.addEventListener("click", (e)=>{
+          const key = e.currentTarget.dataset.colorKey;
+          if(!key) return;
+          if(currentMode===MODE_PRACTICE1 || currentMode===MODE_PRACTICE2){
+            handlePracticeAnswer(key);
+          } else if(currentMode===MODE_TEST){
+            handleTestAnswer(key);
+          }
+        });
+      });
+
+      practiceFeedback.addEventListener("click", ()=>{ proceedAfterPracticeFeedback(); });
+
+      restartBtn.addEventListener("click", ()=>{
+        currentMode = MODE_NONE;
+        countdownScreen.style.display = "none";
+        setModeLabel("");
+        showPage(page1);
+      });
+
+      showDetailBtn.addEventListener("click", ()=>{
+        showPage(detailPage);
+      });
+
+      detailBackBtn.addEventListener("click", ()=>{
+        showPage(page4);
+      });
+    });
+  </script>
+</body>
+</html>
