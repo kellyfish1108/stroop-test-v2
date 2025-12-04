@@ -492,28 +492,50 @@
     }
 
     @media (max-width: 640px) {
-      .page {
-        padding: 18px;
-      }
-      #page-1-card,
-      #page-2-card,
-      #practice-intro-card,
-      #page-4-card,
-      #detail-card {
-        padding: 24px 18px 18px;
-      }
-      #stroop-word {
-        font-size: 18vmin;
-      }
-      .color-button {
-        width: 80px;
-        height: 80px;
-      }
-      .preview-circle {
-        width: 46px;
-        height: 46px;
-      }
-    }
+  .page {
+    padding: 18px;
+  }
+
+  #page-1-card,
+  #page-2-card,
+  #practice-intro-card,
+  #page-4-card,
+  #detail-card {
+    padding: 24px 18px 18px;
+  }
+
+  /* 介紹頁：手機改成上下排列，文字就不會被擠成一條一條 */
+  .page1-main {
+    flex-direction: column;
+    gap: 18px;
+    align-items: stretch;
+  }
+
+  .page1-left,
+  .page1-right {
+    flex: none;
+    width: 100%;
+  }
+
+  .page1-right {
+    justify-content: center;
+  }
+
+  #stroop-word {
+    font-size: 18vmin;
+  }
+
+  .color-button {
+    width: 80px;
+    height: 80px;
+  }
+
+  .preview-circle {
+    width: 46px;
+    height: 46px;
+  }
+}
+
   </style>
 </head>
 <body>
